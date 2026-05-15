@@ -148,19 +148,26 @@ overflow-x:auto;
 table{
 width:100%;
 border-collapse:collapse;
-min-width:100%; /* เดิม 620px */
-table-layout:fixed;
+min-width:550px;
+}
+
+thead{
+background:var(--blue);
+color:#fff;
 }
 
 th{
-padding:8px 4px;
-font-size:.68rem;
+padding:10px 6px;
+font-size:.75rem;
+border:1px solid rgba(255,255,255,.15);
 }
 
 td{
-padding:4px;
-font-size:.68rem;
-word-break:break-word;
+padding:6px;
+border:1px solid #E2E8F0;
+font-size:.78rem;
+background:#fff;
+text-align:center;
 }
 
 td:first-child{
@@ -173,10 +180,13 @@ background:#F9FBFF;
 
 .input{
 width:100%;
-padding:5px;
-font-size:.68rem;
-border-radius:6px;
+padding:7px;
+border:1px solid var(--border);
+border-radius:8px;
+font-size:.76rem;
+background:#F8FBFF;
 }
+
 .ck-group{
 display:flex;
 gap:16px;
@@ -184,12 +194,12 @@ flex-wrap:wrap;
 }
 
 .ck-group label{
-font-size:.72rem; /* เดิม .85rem */
-gap:5px;
-}
-
-.ck-group input[type="radio"]{
-transform:scale(.85);
+display:flex;
+align-items:center;
+gap:8px;
+font-weight:700;
+font-size:.85rem;
+cursor:pointer;
 }
 
 .btn-row{
@@ -264,18 +274,8 @@ font-weight:700;
 
 @media(max-width:500px){
 
-th{
-font-size:.62rem;
-padding:6px 2px;
-}
-
-td{
-font-size:.62rem;
-padding:3px;
-}
-.input{
-padding:4px;
-font-size:.62rem;
+th,td{
+font-size:.7rem;
 }
 
 }
