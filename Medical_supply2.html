@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Medical Supply Ward 15E</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+
+:root{
+--navy:#183153;
+--blue:#2455A6;
+--bg:#EEF3FA;
+--card:#FFFFFF;
+--border:#D7E0EF;
+--text:#1B2B3D;
+--green:#15803d;
+--red:#dc2626;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Sarabun',sans-serif;
+}
+
+body{
+background:var(--bg);
+color:var(--text);
+}
+
+.topbar{
+background:linear-gradient(135deg,var(--navy),var(--blue));
+padding:16px;
+color:#fff;
+position:sticky;
+top:0;
+z-index:100;
+box-shadow:0 3px 10px rgba(0,0,0,.2);
+}
+
+.title{
+font-size:1.05rem;
+font-weight:800;
+}
+
+.sub{
+font-size:.78rem;
+opacity:.85;
+margin-top:2px;
+}
+
+.shift-tabs{
+display:flex;
+gap:8px;
+margin-top:12px;
+}
+
+.shift-btn{
+flex:1;
+border:none;
+border-radius:10px;
+padding:10px;
+font-weight:700;
+background:rgba(255,255,255,.15);
+color:#fff;
+cursor:pointer;
+}
+
+.shift-btn.active{
+background:#fff;
+color:var(--navy);
+}
+
+.nav{
+display:flex;
+background:#fff;
+border-bottom:1px solid var(--border);
+position:sticky;
+top:98px;
+z-index:90;
+}
+
+.nav button{
+flex:1;
+padding:12px;
+border:none;
+background:#fff;
+font-weight:700;
+cursor:pointer;
+color:#64748b;
+border-bottom:3px solid transparent;
+}
+
+.nav button.active{
+color:var(--blue);
+border-color:var(--blue);
+}
+
+.main{
+padding:14px;
+max-width:700px;
+margin:auto;
+}
+
+.card{
+background:var(--card);
+border:1px solid var(--border);
+border-radius:14px;
+padding:14px;
+margin-bottom:14px;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+
+.field{
+margin-bottom:12px;
+}
+
+.field label{
+display:block;
+font-size:.82rem;
+font-weight:700;
+margin-bottom:5px;
+color:var(--navy);
+}
+
+.field input,
+.field textarea{
+width:100%;
+padding:10px;
+border:1px solid var(--border);
+border-radius:10px;
+background:#F7FAFF;
+font-size:.9rem;
+}
+
+.table-wrap{
+overflow-x:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+min-width:620px;
+}
+
+thead{
+background:var(--blue);
+color:#fff;
+}
+
+th{
+padding:10px 6px;
+font-size:.75rem;
+border:1px solid rgba(255,255,255,.15);
+}
+
+td{
+padding:6px;
+border:1px solid #E2E8F0;
+font-size:.78rem;
+background:#fff;
+text-align:center;
+}
+
+td:first-child{
+text-align:left;
+}
+
+tbody tr:nth-child(even) td{
+background:#F9FBFF;
+}
+
+.input{
+width:100%;
+padding:7px;
+border:1px solid var(--border);
+border-radius:8px;
+font-size:.76rem;
+background:#F8FBFF;
+}
+
+.ck-group{
+display:flex;
+gap:16px;
+flex-wrap:wrap;
+}
+
+.ck-group label{
+display:flex;
+align-items:center;
+gap:8px;
+font-weight:700;
+font-size:.85rem;
+cursor:pointer;
+}
+
+.btn-row{
+display:flex;
+gap:10px;
+margin-top:14px;
+}
+
+.btn{
+flex:1;
+padding:12px;
+border:none;
+border-radius:10px;
+font-weight:700;
+cursor:pointer;
+}
+
+.save{
+background:var(--navy);
+color:#fff;
+}
+
+.clear{
+background:#fff;
+border:1px solid var(--border);
+}
+
+.history-card{
+background:#fff;
+border:1px solid var(--border);
+border-radius:14px;
+padding:14px;
+margin-bottom:14px;
+}
+
+.flex{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+margin-bottom:10px;
+}
+
+.small-btn{
+border:none;
+padding:7px 10px;
+border-radius:8px;
+font-size:.72rem;
+font-weight:700;
+cursor:pointer;
+}
+
+.edit{
+background:#DBEAFE;
+color:#1D4ED8;
+}
+
+.delete{
+background:#FEE2E2;
+color:#B91C1C;
+}
+
+.badge-ok{
+color:var(--green);
+font-weight:700;
+}
+
+.badge-ng{
+color:var(--red);
+font-weight:700;
+}
+
+@media(max-width:500px){
+
+th,td{
+font-size:.7rem;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+
+<div class="title">📋 ใบตรวจรับ Medical Supply</div>
+<div class="sub">Ward 15E – Bangkok Hospital Pattaya</div>
+
+<div class="shift-tabs">
+<button class="shift-btn active" id="dayBtn" onclick="setShift('07-19')">☀️ 07-19</button>
+<button class="shift-btn" id="nightBtn" onclick="setShift('19-07')">🌙 19-07</button>
+</div>
+
+</div>
+
+<div class="nav">
+<button class="active" id="formTab" onclick="showPage('form')">📝 บันทึก</button>
+<button id="historyTab" onclick="showPage('history')">🗂 ย้อนหลัง</button>
+</div>
+
+<!-- FORM -->
+
+<div class="main" id="formPage">
+
+<div class="card">
+
+<div class="field">
+<label>วันที่</label>
+<input type="date" id="date">
+</div>
+
+<div class="field">
+<label>Team A</label>
+<input type="text" id="teamA">
+</div>
+
+<div class="field">
+<label>Team B</label>
+<input type="text" id="teamB">
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+<th>รายการ</th>
+<th>จำนวน stock</th>
+<th>จำนวนนับ</th>
+<th>เบิกใช้ห้อง</th>
+</tr>
+</thead>
+
+<tbody id="tbody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="field">
+
+<label>สรุป</label>
+
+<div class="ck-group">
+
+<label>
+<input type="radio" name="summary" value="ครบ" id="summary_ok">
+<span class="badge-ok">ครบ</span>
+</label>
+
+<label>
+<input type="radio" name="summary" value="ไม่ครบ" id="summary_ng">
+<span class="badge-ng">ไม่ครบ</span>
+</label>
+
+</div>
+
+</div>
+
+<div class="field">
+<label>รายการที่หายไป</label>
+
+<textarea
+id="missing_list"
+rows="5"
+placeholder="เช่น&#10;1. TRAY S&#10;2. Dressing"></textarea>
+
+</div>
+
+<div class="btn-row">
+
+<button class="btn save" onclick="saveData()">💾 บันทึก</button>
+
+<button class="btn clear" onclick="clearForm()">🗑 ล้าง</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- HISTORY -->
+<div class="main" id="historyPage" style="display:none;">
+  <div class="card">
+    <div class="field">
+      <label>เลือกเดือน</label>
+      <input type="month" id="monthFilter" onchange="loadHistory()">
+    </div>
+
+    <button 
+    class="btn delete" 
+    style="width:100%;margin-top:10px;"
+    onclick="deleteMonthData()">
+    🗑 ลบข้อมูลทั้งเดือน
+    </button>
+
+  </div>
+
+  <div id="historyList"></div>
+</div>
+
+<script>
+
+function deleteMonthData(){
+
+  const month = document.getElementById("monthFilter").value;
+
+  if(!month){
+    showToast("⚠️ กรุณาเลือกเดือน");
+    return;
+  }
+
+  if(!confirm(`ลบข้อมูลทั้งหมดของเดือน ${month} ?`)) return;
+
+  db.ref("medicalSupply").once("value",(snap)=>{
+
+    const data = snap.val();
+
+    if(!data){
+      showToast("ไม่มีข้อมูล");
+      return;
+    }
+
+    const updates = {};
+
+    Object.keys(data).forEach(key=>{
+
+      const item = data[key];
+
+      if(item.date && item.date.startsWith(month)){
+        updates[key] = null;
+      }
+
+    });
+
+    db.ref("medicalSupply").update(updates)
+    .then(()=>{
+
+      showToast("🗑 ลบข้อมูลทั้งเดือนเรียบร้อย");
+      loadHistory();
+
+    })
+    .catch((error)=>{
+
+      console.error(error);
+      showToast("❌ ลบไม่สำเร็จ");
+
+    });
+
+  });
+
+}
+
+</script>
+<script>
+
+firebase.initializeApp({
+
+apiKey: "YOUR_API_KEY",
+authDomain: "YOUR_PROJECT.firebaseapp.com",
+databaseURL: "https://YOUR_PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "YOUR_PROJECT",
+storageBucket: "YOUR_PROJECT.appspot.com",
+messagingSenderId: "YOUR_SENDER_ID",
+appId: "YOUR_APP_ID"
+
+});
+
+const db = firebase.database();
+
+const ITEMS = [
+
+["TRAY S",9],
+["Dressing",6],
+["Syringe 50",3],
+["Set Irrigate",2],
+["Tube Drain Meter 1.8",10],
+["Retain Catheter",3],
+["Set Flush",13],
+["Suction Container (Crd. Liner 1.5)",5],
+["Blue pad Extra 90 X 60",40],
+["Baby Wipes",5],
+["กรรไกรตัดไหม",2],
+["Razor Blade",3],
+["Finger Tip",5],
+["Oral Air Way เขียว No.3 – เหลือง No.4","2-3"],
+["Urine Bag",2],
+["Aqua Pack 760 ml.",1],
+["Aqua Pack 340",3],
+["Oxygen Cannula",5],
+["Mask With Bag",2],
+["Set พ่นยา",5],
+["Bone Marrow ใหญ่ – เล็ก","2-2"],
+["Pampers Size L",30],
+["Uro Hat",5],
+["Urine Container 1100",10],
+["เข็มขัดพยุงตัวผู้ป่วย",1],
+["เครื่องชั่งPampers",2],
+["Urinal ชมพู",7],
+["Urinal ฟ้า",5],
+["Cold Pack","ใหญ่ 3 เล็ก 1"],
+["กระเป๋าไฟฟ้า",1],
+["ที่ชาร์จ – ด้านAA สีขาว","2-8"],
+["ปรอทวัดไข้สีขาว",3],
+["Bed Pan",1]
+
+];
+
+let currentShift = "07-19";
+
+function renderTable(){
+
+let html = "";
+
+ITEMS.forEach((item,index)=>{
+
+html += `
+
+<tr>
+
+<td>${index+1}. ${item[0]}</td>
+
+<td>${item[1]}</td>
+
+<td>
+<input class="input" id="count_${index}">
+</td>
+
+<td>
+<input class="input" id="note_${index}">
+</td>
+
+</tr>
+
+`;
+
+});
+
+document.getElementById("tbody").innerHTML = html;
+
+}
+
+function setShift(shift){
+
+currentShift = shift;
+
+document.getElementById("dayBtn").classList.remove("active");
+document.getElementById("nightBtn").classList.remove("active");
+
+if(shift==="07-19"){
+document.getElementById("dayBtn").classList.add("active");
+}else{
+document.getElementById("nightBtn").classList.add("active");
+}
+
+}
+
+function saveData(){
+
+const date = document.getElementById("date").value;
+
+if(!date){
+alert("กรุณาเลือกวันที่");
+return;
+}
+
+const data = {
+
+date,
+shift: currentShift,
+
+teamA: document.getElementById("teamA").value,
+teamB: document.getElementById("teamB").value,
+
+summary: document.querySelector('input[name="summary"]:checked')?.value || "",
+
+missingList: document.getElementById("missing_list").value,
+
+items:[]
+
+};
+
+ITEMS.forEach((item,index)=>{
+
+data.items.push({
+
+name:item[0],
+stock:item[1],
+
+count:document.getElementById(`count_${index}`).value,
+
+note:document.getElementById(`note_${index}`).value
+
+});
+
+});
+
+const key = `${date}_${currentShift}`;
+
+db.ref("medicalSupply/"+key).set(data)
+.then(() => {
+
+alert("บันทึกสำเร็จ");
+loadHistory();
+
+})
+.catch((error) => {
+
+console.log(error);
+alert("เกิดข้อผิดพลาด : " + error.message);
+
+});
+
+}
+
+function clearForm(){
+
+document.getElementById("teamA").value = "";
+document.getElementById("teamB").value = "";
+
+document.getElementById("summary_ok").checked = false;
+document.getElementById("summary_ng").checked = false;
+
+document.getElementById("missing_list").value = "";
+
+ITEMS.forEach((item,index)=>{
+
+document.getElementById(`count_${index}`).value = "";
+document.getElementById(`note_${index}`).value = "";
+
+});
+
+}
+
+function showPage(page){
+
+document.getElementById("formPage").style.display =
+page==="form" ? "block":"none";
+
+document.getElementById("historyPage").style.display =
+page==="history" ? "block":"none";
+
+document.getElementById("formTab").classList.remove("active");
+document.getElementById("historyTab").classList.remove("active");
+
+if(page==="form"){
+
+document.getElementById("formTab").classList.add("active");
+
+}else{
+
+document.getElementById("historyTab").classList.add("active");
+loadHistory();
+
+}
+
+}
+
+function loadHistory(){
+
+const month = document.getElementById("monthFilter").value;
+
+db.ref("medicalSupply").once("value",(snap)=>{
+
+const data = snap.val();
+
+if(!data){
+
+document.getElementById("historyList").innerHTML =
+"<div class='card'>ไม่มีข้อมูล</div>";
+
+return;
+
+}
+
+let html = "";
+
+Object.keys(data).reverse().forEach(key=>{
+
+const item = data[key];
+
+if(month && !item.date.startsWith(month)) return;
+
+html += `
+
+<div class="history-card">
+
+<div class="flex">
+
+<div>
+
+<div style="font-weight:800;color:#183153;">
+📅 ${item.date}
+</div>
+
+<div style="font-size:.8rem;">
+${item.shift}
+</div>
+
+</div>
+
+<div style="display:flex;gap:8px;">
+
+<button class="small-btn edit"
+onclick="editData('${key}')">
+แก้ไข
+</button>
+
+<button class="small-btn delete"
+onclick="deleteData('${key}')">
+ลบ
+</button>
+
+</div>
+
+</div>
+
+<div style="font-size:.82rem;line-height:1.7;">
+
+<b>Team A:</b> ${item.teamA || "-"}<br>
+
+<b>Team B:</b> ${item.teamB || "-"}<br>
+
+<b>สรุป:</b> ${item.summary || "-"}<br>
+
+<b>รายการที่หาย:</b><br>
+${(item.missingList || "-").replace(/\n/g,"<br>")}
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("historyList").innerHTML = html;
+
+});
+
+}
+
+function deleteData(key){
+
+if(!confirm("ลบข้อมูลนี้ใช่หรือไม่")) return;
+
+db.ref("medicalSupply/"+key).remove()
+
+.then(()=>{
+
+loadHistory();
+
+});
+
+}
+
+function editData(key){
+
+db.ref("medicalSupply/"+key).once("value",(snap)=>{
+
+const data = snap.val();
+
+showPage("form");
+
+document.getElementById("date").value = data.date;
+
+document.getElementById("teamA").value = data.teamA || "";
+document.getElementById("teamB").value = data.teamB || "";
+
+document.getElementById("missing_list").value =
+data.missingList || "";
+
+if(data.summary==="ครบ"){
+document.getElementById("summary_ok").checked = true;
+}
+
+if(data.summary==="ไม่ครบ"){
+document.getElementById("summary_ng").checked = true;
+}
+
+setShift(data.shift);
+
+data.items.forEach((item,index)=>{
+
+document.getElementById(`count_${index}`).value =
+item.count || "";
+
+document.getElementById(`note_${index}`).value =
+item.note || "";
+
+});
+
+});
+
+}
+
+document.getElementById("date").value =
+new Date().toISOString().split("T")[0];
+
+document.getElementById("monthFilter").value =
+new Date().toISOString().slice(0,7);
+
+renderTable();
+console.log("JS RUNNING");
+</script>
+
+</body>
+</html>
